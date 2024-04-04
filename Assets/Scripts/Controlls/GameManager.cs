@@ -1,15 +1,25 @@
-﻿using ExitGames.Client.Photon;
+﻿using System;
+using System.Collections.Generic;
+using Systems;
+using DefaultNamespace.DTO;
+using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-namespace Controlls
+namespace Controllers
 {
-    public class GameManager : MonoBehaviourPunCallbacks, IOnEventCallback
+    public class GameManager : MonoBehaviourPunCallbacks
     {
         [SerializeField] private GameObject _playerPrefab;
         [SerializeField] private TextMeshProUGUI _textMesh;
+        
+        private void Awake()
+        {
+            RegisterCustomTypes();
+        }
 
         private void Start()
         {
@@ -29,14 +39,18 @@ namespace Controlls
             PhotonNetwork.RemoveCallbackTarget(this);
         }
 
+        private void RegisterCustomTypes()
+        {
+            PhotonPeer.RegisterType(typeof(UserData), 0, DataManipulator.SerializeUserData,
+                DataManipulator.DeserializeUserData);
+            
+            PhotonPeer.RegisterType(typeof(List<UserData>), 1, DataManipulator.SerializeListToByteArray,
+                DataManipulator.DeserializeListFromByteArray);
+        }
         public void Leave()
         {
-            Debug.Log("click");
-            
-            PhotonNetwork.RaiseEvent(1, "bober livaet", new RaiseEventOptions() {Receivers = ReceiverGroup.Others},
-                new SendOptions() {Reliability = true});
-            
-            //PhotonNetwork.LeaveRoom();
+            PhotonNetwork.LeaveRoom();
+            SceneManager.LoadScene(0);
         }
         
         public override void OnLeftRoom()
@@ -53,22 +67,8 @@ namespace Controlls
         {
             Debug.Log("Player left: " + otherPlayer.NickName);
             
-            PhotonNetwork.DestroyPlayerObjects(otherPlayer);
-        }
-
-        private void Log(string text)
-        {
-            _textMesh.text += "\n" + text;
-        }
-
-        public void OnEvent(EventData photonEvent)
-        {
-            switch (photonEvent.Code)
-            {
-                case 1:
-                    Debug.Log((string)photonEvent.CustomData);
-                    break;
-            }
+            if(PhotonNetwork.IsMasterClient)
+                PhotonNetwork.DestroyPlayerObjects(otherPlayer);
         }
     }
 }

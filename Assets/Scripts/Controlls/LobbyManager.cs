@@ -10,7 +10,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     
     void Start()
     {
-        PhotonNetwork.NickName = "User" + Random.Range(0, 1000);
+        PhotonNetwork.NickName = "User " + Random.Range(0, 10000);
         PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.GameVersion = "1";
         PhotonNetwork.ConnectUsingSettings();

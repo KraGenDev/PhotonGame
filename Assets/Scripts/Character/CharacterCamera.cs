@@ -1,5 +1,4 @@
-﻿using System;
-using DefaultNamespace;
+﻿using DefaultNamespace;
 using Photon.Pun;
 using UnityEngine;
 
@@ -11,14 +10,16 @@ namespace Character
         [SerializeField] private float minAngle;
         [SerializeField] private float maxAngle;
         [SerializeField] private PhotonView _photonView;
-        [SerializeField] private Camera _camera;
-        
+
         private IInput _input;
         private float X, Y;
 
         private void Start()
         {
-            _camera.enabled = _photonView.IsMine;
+            var camera = GetComponent<Camera>();
+            var listener = GetComponent<AudioListener>();
+            camera.enabled = _photonView.IsMine;
+            listener.enabled = _photonView.IsMine;
         }
 
         private void Update()
